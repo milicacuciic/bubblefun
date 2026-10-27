@@ -1,0 +1,879 @@
+<title>BubbleFun</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400&family=Poppins:wght@400;500;700&display=swap">
+<style>
+/* Layout: 1440x7807 Figma canvas reproduced 1:1 with absolute positioning, scaled to fit any viewport */
+:root{
+  --ink:#000;
+  --pink:#fc4e77;
+  --pink2:#fd587d;
+  --mint:#a8f5b2;
+  --sun:#ffd84d;
+  --sun2:#fdd907;
+  --display:"DynaPuff","Comic Sans MS",cursive,sans-serif;
+  --body:"Poppins","Segoe UI",system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#fdf5ef;overflow-x:hidden}
+#viewport{overflow:hidden;position:relative}
+#stage{width:1440px;height:7807px}
+#stage-m{width:375px;height:7988px;display:none}
+.st{
+  position:relative;transform-origin:top left;
+  font-family:var(--body);color:var(--ink);overflow:hidden;
+  background:
+    radial-gradient(42% 16% at 14% 5%, #ffdcef 0%, rgba(255,220,239,0) 70%),
+    radial-gradient(40% 14% at 84% 8%, #d8f0ff 0%, rgba(216,240,255,0) 70%),
+    radial-gradient(44% 15% at 25% 20%, #e3fbdc 0%, rgba(227,251,220,0) 70%),
+    radial-gradient(40% 13% at 78% 28%, #fff0c9 0%, rgba(255,240,201,0) 70%),
+    radial-gradient(46% 14% at 18% 40%, #f0e2ff 0%, rgba(240,226,255,0) 70%),
+    radial-gradient(42% 13% at 86% 48%, #ffe0e9 0%, rgba(255,224,233,0) 70%),
+    radial-gradient(44% 14% at 30% 60%, #d9f6ff 0%, rgba(217,246,255,0) 70%),
+    radial-gradient(40% 12% at 80% 70%, #e8fbdf 0%, rgba(232,251,223,0) 70%),
+    radial-gradient(46% 14% at 20% 82%, #ffe6f3 0%, rgba(255,230,243,0) 70%),
+    radial-gradient(42% 13% at 82% 92%, #efe4ff 0%, rgba(239,228,255,0) 70%),
+    linear-gradient(180deg,#fdf4ee 0%,#f6f2fb 30%,#fdf0f4 55%,#f3f8fb 78%,#fdf5ef 100%);
+}
+.a{position:absolute}
+.clip{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.clip img{position:absolute;max-width:none;display:block}
+.cover{width:100%;height:100%;object-fit:cover;display:block}
+p{margin:0}
+.d{font-family:var(--display);font-weight:400;white-space:pre-wrap}
+.pre{white-space:pre-wrap}
+.ctr{text-align:center}
+.bd3{border:3px solid #000}.bd4{border:4px solid #000}.bd5{border:5px solid #000}
+.bd6{border:6px solid #000}.bd9{border:9px solid #000}
+.r30{border-radius:30px}.r40{border-radius:40px}.r50{border-radius:50px}
+.r99{border-radius:99px}.rfull{border-radius:999px}
+.btn{
+  --rot:0deg;
+  display:flex;align-items:center;justify-content:center;background:var(--pink);
+  border:3px solid #000;border-radius:999px;font-family:var(--body);font-size:18px;
+  line-height:26px;color:#000;cursor:pointer;padding:10px;text-decoration:none;
+  transform:rotate(var(--rot));
+  animation:idlewiggle 3.4s ease-in-out infinite;
+}
+.btn:nth-of-type(2n){animation-delay:-.7s}
+.btn:nth-of-type(3n){animation-delay:-1.5s}
+.btn:nth-of-type(5n){animation-delay:-2.2s}
+@keyframes idlewiggle{
+  0%,100%{transform:rotate(var(--rot)) translateY(0)}
+  50%{transform:rotate(calc(var(--rot) + 1.4deg)) translateY(-2px)}
+}
+@keyframes wiggle{
+  0%,100%{transform:rotate(var(--rot)) scale(1.04)}
+  20%{transform:rotate(calc(var(--rot) - 6deg)) scale(1.04)}
+  40%{transform:rotate(calc(var(--rot) + 5deg)) scale(1.04)}
+  60%{transform:rotate(calc(var(--rot) - 4deg)) scale(1.04)}
+  80%{transform:rotate(calc(var(--rot) + 3deg)) scale(1.04)}
+}
+.btn:hover,.btn:focus-visible{animation:wiggle .5s ease-in-out infinite;filter:brightness(1.06)}
+.btn:active{animation:none;transform:rotate(var(--rot)) scale(.96)}
+.btn:focus-visible{outline:3px solid #000;outline-offset:3px}
+@media (prefers-reduced-motion:reduce){
+  .btn,.btn:hover,.btn:focus-visible{animation:none}
+}
+.btn--o{background:transparent}
+.ph{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font-family:var(--body);font-size:13px;letter-spacing:.1em;color:#8a8a95;
+  background:repeating-linear-gradient(45deg,#f3eef7,#f3eef7 10px,#ece6f2 10px,#ece6f2 20px);
+  width:100%;height:100%;padding:10px;
+}
+.mq{overflow:hidden;background:var(--sun);display:flex;align-items:center}
+.mq-t{display:flex;width:max-content;animation:sl 30s linear infinite}
+.mq-t span{font-family:var(--display);font-size:20px;letter-spacing:.6px;white-space:nowrap}
+@keyframes sl{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.mq-t{animation:none}}
+input,select,textarea{
+  font-family:var(--body);font-size:16px;background:#fff8e8;border:3px solid #000;
+  border-radius:999px;box-shadow:0 4px 4px rgba(0,0,0,.25);width:100%;height:100%;
+  padding:0 20px;color:#000;
+}
+textarea{border-radius:40px;padding:14px 20px;resize:none}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #000;outline-offset:2px}
+a{color:inherit}
+</style>
+
+<div id="viewport"><div id="stage" class="st">
+
+<div class="clip" style="z-index:0"><img style="height:100.6%;left:-304.45%;top:-0.01%;width:937.06%;opacity:.85" src="img/bg.jpg" alt=""></div>
+
+<!-- ================= HERO 0–932 ================= -->
+<!-- nav -->
+<div class="a" style="left:145.18px;top:27.94px;width:177.533px;height:53.114px;display:flex;align-items:center;justify-content:center">
+  <a class="btn btn--o" href="#flavours" style="--rot:-2deg;width:176px;border-color:#151515">Flavours</a>
+</div>
+<div class="a" style="left:349.18px;top:28.15px;width:165.54px;height:52.695px;display:flex;align-items:center;justify-content:center">
+  <a class="btn btn--o" href="#health" style="--rot:2deg;width:164px;border-color:#151515">Health</a>
+</div>
+<!-- arc wordmark -->
+<div class="a" style="left:626px;top:27px;width:190px;height:60px">
+  <span class="d a" style="left:0;top:27.41px;font-size:24px;transform:rotate(-40.74deg)">B</span>
+  <span class="d a" style="left:19.27px;top:14.27px;font-size:24px;transform:rotate(-30.18deg)">U</span>
+  <span class="d a" style="left:41.06px;top:5.21px;font-size:24px;transform:rotate(-19.62deg)">B</span>
+  <span class="d a" style="left:64.63px;top:0.52px;font-size:24px;transform:rotate(-9.05deg)">B</span>
+  <span class="d a" style="left:88.5px;top:0;font-size:24px;transform:rotate(1.01deg)">L</span>
+  <span class="d a" style="left:106.06px;top:1.09px;font-size:24px;transform:rotate(10.56deg)">E</span>
+  <span class="d a" style="left:123.3px;top:5.88px;font-size:24px;transform:rotate(19.87deg)">F</span>
+  <span class="d a" style="left:138.79px;top:13.74px;font-size:24px;transform:rotate(29.68deg)">U</span>
+  <span class="d a" style="left:155.51px;top:26.72px;font-size:24px;transform:rotate(40.49deg)">N</span>
+</div>
+<div class="a" style="left:914.08px;top:24.88px;width:181.845px;height:62.248px;display:flex;align-items:center;justify-content:center">
+  <a class="btn btn--o" href="#fans" style="--rot:-2deg;width:180px;border-color:#181818">Fans</a>
+</div>
+<div class="a" style="left:1109.07px;top:23.02px;width:173.85px;height:61.969px;display:flex;align-items:center;justify-content:center">
+  <a class="btn" href="#flavours" style="--rot:2deg;width:172px;height:56px;border-color:#151515">Shop the pop</a>
+</div>
+
+<!-- gum cluster -->
+<div class="a" style="left:833.26px;top:203.09px;width:241.471px;height:198.824px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-7.02deg);filter:blur(2.5px);width:222px;height:173px;position:relative">
+    <div class="clip"><img style="height:270.9%;left:-210.49%;top:-142.33%;width:316.05%" src="img/tins.png" alt=""></div>
+  </div>
+</div>
+<div class="a" style="left:973.79px;top:233.03px;width:283.423px;height:237.943px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(5.91deg);filter:blur(2px);width:263px;height:212px;position:relative">
+    <div class="clip"><img style="height:261.23%;left:-108.76%;top:-136.04%;width:314.77%" src="img/tins.png" alt=""></div>
+  </div>
+</div>
+<div class="a" style="left:692.37px;top:312.32px;width:325.263px;height:267.366px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-3.68deg);filter:blur(1.5px);width:310px;height:248px;position:relative">
+    <div class="clip"><img style="height:242.08%;left:0.04%;top:-123.73%;width:290.91%" src="img/tins.png" alt=""></div>
+  </div>
+</div>
+<img class="a" style="left:1045.22px;top:321.85px;width:255.565px;height:291.135px" src="img/tin-mint.png" alt="">
+<img class="a" style="left:776.87px;top:364.19px;width:413.977px;height:420.521px" src="img/tin-straw.png" alt="BubbleFun strawberry tin">
+<div class="a" style="left:740px;top:770px;width:530px;height:50px;background:radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,.16) 0%, rgba(0,0,0,0) 70%)"></div>
+
+<p class="a" style="left:162px;top:289px;font-size:12px;white-space:nowrap">NEW DROP • SUGAR FREE • BIG FLAVOR</p>
+<p class="d a" style="left:156px;top:307px;width:646px;font-size:96px;line-height:1.05">CHEW BIG.</p>
+<div class="a" style="left:121px;top:412px;width:221.147px;height:125.882px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-5.82deg);background:var(--pink);border-radius:30px;width:211.597px;height:104.974px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <p class="d" style="font-size:96px;line-height:1.04">POP</p>
+  </div>
+</div>
+<p class="d a" style="left:342px;top:414px;width:435px;font-size:96px;line-height:1.05">BIGGER.</p>
+<p class="a pre" style="left:156px;top:548px;font-size:16px;line-height:26px">Sugar free gum made to stand out.
+Bold flavors, wild shapes, and bubbles worth showing off.</p>
+<a class="btn btn--o a" href="#flavours" style="left:156px;top:627px;width:211px;height:52px">Explore flavours</a>
+<a class="btn a" href="#club" style="left:395px;top:627px;width:210px;height:52px">Shop the pop</a>
+
+<!-- ================= MARQUEE 932 ================= -->
+<div class="mq a" style="left:0;top:932px;width:1440px;height:93px;border-top:3px solid #000;border-bottom:3px solid #000">
+  <div class="mq-t">
+    <span>SUGAR FREE • BIG FLAVOR • ZERO GUILT • FRESH BREATH • WILD SHAPES • DENTIST APPROVED • SUGAR FREE • BIG FLAVOR • ZERO GUILT • FRESH BREATH • WILD SHAPES • DENTIST APPROVED •&nbsp;</span>
+    <span>SUGAR FREE • BIG FLAVOR • ZERO GUILT • FRESH BREATH • WILD SHAPES • DENTIST APPROVED • SUGAR FREE • BIG FLAVOR • ZERO GUILT • FRESH BREATH • WILD SHAPES • DENTIST APPROVED •&nbsp;</span>
+  </div>
+</div>
+
+<!-- ================= CLAIM 1025–2487 ================= -->
+<div class="a" id="health" style="left:0;top:1025px;width:1440px;height:1462px">
+  <!-- green blob behind photo -->
+  <div class="a" style="left:315.09px;top:232.06px;width:830.117px;height:595.824px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(3.31deg);background:var(--mint);width:799.662px;height:550.571px;border-radius:99px"></div>
+  </div>
+  <!-- photo -->
+  <div class="a" style="left:314px;top:243px;width:818.054px;height:570.678px;display:flex;align-items:center;justify-content:center">
+    <div class="bd4" style="transform:rotate(3.31deg);width:789px;height:526px;border-radius:99px;overflow:hidden">
+      <img class="cover" src="img/doctor.jpg" alt="Dentist in a white coat">
+    </div>
+  </div>
+  <p class="d a ctr" style="left:370px;top:93px;width:791px;font-size:64px;line-height:1.12;white-space:pre">BIG CHEW.                 REGRET.</p>
+  <div class="a" style="left:682px;top:80px;width:216.446px;height:98.754px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-5.82deg);background:var(--pink2);border-radius:30px;width:209.629px;height:77.906px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+      <p class="d" style="font-size:64px;line-height:1.1">ZERO</p>
+    </div>
+  </div>
+  <!-- doctor quote -->
+  <div class="a" style="left:505px;top:729px;width:521.103px;height:233.438px;display:flex;align-items:center;justify-content:center">
+    <blockquote class="bd3" style="transform:rotate(-5.07deg);background:#fff;border-radius:40px;width:506.34px;height:189.412px;display:flex;align-items:center;justify-content:center;padding:10px;margin:0;filter:drop-shadow(0 4px 2px rgba(0,0,0,.25))">
+      <p class="ctr pre" style="width:478px;font-size:24px;line-height:1.25">“It’s the only gum I recommend to my younger patients. Sugar free, xylitol powered, and somehow still fun.”
+— Dr. Eddy Patel, DDS</p>
+    </blockquote>
+  </div>
+  <!-- feature card 1 -->
+  <div class="a" style="left:146.76px;top:1059.39px;width:346.814px;height:323.091px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-7deg) skewX(-3.67deg);background:var(--mint);width:332.876px;height:283px;border-radius:40px"></div>
+  </div>
+  <div class="a" style="left:147.41px;top:1066.92px;width:334.082px;height:308.642px;display:flex;align-items:center;justify-content:center">
+    <div class="bd3" style="transform:rotate(-7deg) skewX(-3.67deg);background:#fff;width:320.808px;height:270px;border-radius:40px;position:relative">
+      <div class="a" style="left:128.11px;top:27.34px;width:62.622px;height:61.411px;display:flex;align-items:center;justify-content:center">
+        <img style="transform:rotate(1.24deg) skewX(3.67deg);width:60px;height:60px;object-fit:contain" src="img/ic-tooth.png" alt="">
+      </div>
+      <p class="a ctr" style="left:11px;top:112px;width:275px;font-size:20px;line-height:1.25">Made with xylitol to help reduce cavity causing bacteria while keeping every chew flavorful.</p>
+    </div>
+  </div>
+  <!-- feature card 2 -->
+  <div class="a" style="left:542.71px;top:1058.45px;width:354.797px;height:323.485px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(7deg) skewX(3.04deg);background:var(--mint);width:337.754px;height:283px;border-radius:40px"></div>
+  </div>
+  <div class="a" style="left:543.89px;top:1064.39px;width:341.745px;height:309.024px;display:flex;align-items:center;justify-content:center">
+    <div class="bd3" style="transform:rotate(7deg) skewX(3.04deg);background:#fff;width:325.509px;height:270px;border-radius:40px;position:relative">
+      <div class="a" style="left:118.79px;top:30.11px;width:72.32px;height:71.54px;display:flex;align-items:center;justify-content:center">
+        <img style="transform:rotate(-1.19deg) skewX(-3.04deg);width:70px;height:70px;object-fit:contain" src="img/ic-breath.png" alt="">
+      </div>
+      <p class="a ctr" style="left:21px;top:120px;width:284px;font-size:20px;line-height:1.25">Long lasting flavor that stays bold long after the bubble pops.</p>
+    </div>
+  </div>
+  <!-- feature card 3 -->
+  <div class="a" style="left:949px;top:1051.26px;width:357.423px;height:343.741px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-10.65deg) skewX(-4.65deg);background:var(--mint);width:333.52px;height:283.678px;border-radius:40px"></div>
+  </div>
+  <div class="a" style="left:950.9px;top:1060.36px;width:342.028px;height:326.565px;display:flex;align-items:center;justify-content:center">
+    <div class="bd3" style="transform:rotate(-10.65deg) skewX(-4.65deg);background:#fff;width:319.413px;height:269.028px;border-radius:40px;position:relative">
+      <div class="a" style="left:122.67px;top:21.78px;width:83.764px;height:78.882px;display:flex;align-items:center;justify-content:center">
+        <img style="transform:rotate(0.46deg) skewX(4.64deg);width:78px;height:78px;object-fit:contain" src="img/ic-sugarfree.png" alt="">
+      </div>
+      <p class="a ctr" style="left:25px;top:121px;width:264.35px;font-size:20px;line-height:1.25">Designed for fun without the sugar crash. Big flavor, cleaner ingredients, fresher breath.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================= PRODUCTS 2487–5064 ================= -->
+<div class="a" id="flavours" style="left:0;top:2487px;width:1440px;height:2577px">
+  <div class="a" style="left:131px;top:111px;width:216.446px;height:98.754px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-5.82deg);background:var(--pink2);border-radius:30px;width:209.629px;height:77.906px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+      <p class="d" style="font-size:64px;line-height:1.1;letter-spacing:1.92px">PICK</p>
+    </div>
+  </div>
+  <p class="d a" style="left:168px;top:120px;width:544px;font-size:64px;line-height:76px;letter-spacing:1.92px;white-space:pre">             YOUR
+BUBBLE MOOD.</p>
+  <p class="a" style="left:778px;top:181px;width:444px;font-size:16px;line-height:1.35">Every BubbleFun shape brings a different flavor hit from juicy fruit blasts to cool mint chaos.</p>
+
+  <!-- Lemon -->
+  <div class="a" style="left:139.33px;top:335.75px;width:587.343px;height:687.499px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-2.59deg);background:var(--mint);width:558px;height:663px;border-radius:50px"></div>
+  </div>
+  <div class="a" style="left:142.18px;top:355.27px;width:571.688px;height:649.905px;display:flex;align-items:center;justify-content:center">
+    <div class="bd6" style="transform:rotate(-2.59deg);background:#fff3db;width:544px;height:626px;border-radius:50px;overflow:hidden;position:relative">
+      <div class="a" style="left:62.5px;top:-5.43px;width:405.976px;height:419.434px">
+        <div class="clip"><img style="height:313.14%;left:-366.48%;top:-107.06%;width:484.16%" src="img/warm.jpg" alt=""></div>
+      </div>
+      <div class="a bd3 r99" style="left:7px;top:24px;width:122px;height:43px;background:var(--sun2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:.36px">NEW</div>
+      <div class="a" style="left:-27px;top:397px;width:577px;height:223px;background:#fff;border-radius:40px;overflow:hidden">
+        <p class="d a" style="left:53px;top:34px;font-size:24px">Lemon Burst</p>
+        <p class="a" style="left:53px;top:81px;width:405px;font-size:16px">Bright citrus energy packed into every chew.</p>
+        <p class="a" style="left:53px;top:134px;font-size:30px;font-weight:500">$3.99</p>
+        <a class="btn a" href="#club" style="left:322px;top:134px;width:207px;height:52px">Grab a pack</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orange -->
+  <div class="a" style="left:731.6px;top:338.46px;width:580.798px;height:682.07px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(2deg);background:var(--mint);width:558px;height:663px;border-radius:50px"></div>
+  </div>
+  <div class="a" style="left:730.22px;top:357.7px;width:565.551px;height:645.603px;display:flex;align-items:center;justify-content:center">
+    <div class="bd6" style="transform:rotate(2deg);background:#fee1c6;width:544px;height:627px;border-radius:50px;overflow:hidden;position:relative">
+      <div class="a" style="left:36.44px;top:1.24px;width:484.127px;height:395.536px">
+        <div class="clip"><img style="height:315.45%;left:-286.9%;top:-210.4%;width:386.9%" src="img/warm.jpg" alt=""></div>
+      </div>
+      <div class="a bd3 r99" style="left:13px;top:21px;width:122px;height:43px;background:var(--sun);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:.36px">NEW</div>
+      <div class="a" style="left:-10px;top:397px;width:577px;height:228px;background:#fff;border-radius:40px;overflow:hidden">
+        <p class="d a" style="left:34px;top:34px;font-size:24px">Orange Splash</p>
+        <p class="a" style="left:36px;top:81px;width:450px;font-size:16px">Sweet orange flavor that pops instantly.</p>
+        <p class="a" style="left:36px;top:148px;font-size:30px;font-weight:500">$3.99</p>
+        <a class="btn a" href="#club" style="left:300px;top:138px;width:207px;height:52px">Grab a pack</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plum -->
+  <div class="a" style="left:151.25px;top:1049.18px;width:569.503px;height:673.637px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(1deg);background:var(--mint);width:558px;height:664px;border-radius:50px"></div>
+  </div>
+  <div class="a" style="left:153.57px;top:1067.3px;width:554.86px;height:636.399px;display:flex;align-items:center;justify-content:center">
+    <div class="bd6" style="transform:rotate(1deg);background:#e9d9f7;width:544px;height:627px;border-radius:50px;overflow:hidden;position:relative">
+      <div class="a" style="left:77.34px;top:-11.36px;width:370.516px;height:447.28px">
+        <div class="clip"><img style="height:234.32%;left:-324.03%;top:-3.89%;width:424.03%" src="img/cool.jpg" alt=""></div>
+      </div>
+      <div class="a bd3 r99" style="left:8px;top:24px;width:122px;height:43px;background:#fb8427;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:.36px">LIMITED</div>
+      <div class="a" style="left:-27px;top:397px;width:586px;height:224px;background:#fff;border-radius:40px;overflow:hidden">
+        <p class="d a" style="left:58px;top:30px;font-size:24px">Plum Bliss</p>
+        <p class="a" style="left:58px;top:77px;width:441px;font-size:16px">Smooth fruity chew with juicy plum notes.</p>
+        <p class="a" style="left:58px;top:138px;font-size:30px;font-weight:500">$4.49</p>
+        <a class="btn a" href="#club" style="left:323px;top:132px;width:207px;height:52px">Grab a pack</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Strawberry -->
+  <div class="a" style="left:731.58px;top:1044.47px;width:580.833px;height:683.069px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-2deg);background:var(--mint);width:558px;height:664px;border-radius:50px"></div>
+  </div>
+  <div class="a" style="left:733.24px;top:1062.7px;width:565.516px;height:644.604px;display:flex;align-items:center;justify-content:center">
+    <div class="bd6" style="transform:rotate(-2deg);background:#fce7ec;width:544px;height:626px;border-radius:50px;overflow:hidden;position:relative">
+      <div class="a" style="left:31.81px;top:-3.26px;width:480.002px;height:396.627px">
+        <div class="clip"><img style="height:307.51%;left:-281.14%;top:0;width:381.14%" src="img/warm.jpg" alt=""></div>
+      </div>
+      <div class="a bd3 r99" style="left:8px;top:21px;width:122px;height:43px;background:var(--mint);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:.36px">BESTSELLER</div>
+      <div class="a" style="left:-7px;top:394px;width:545px;border-top:4px solid #000"></div>
+      <div class="a" style="left:-27px;top:394px;width:583px;height:223px;background:#fff;border-radius:40px;overflow:hidden">
+        <p class="d a" style="left:54px;top:30px;font-size:24px">Strawberry Blast</p>
+        <p class="a" style="left:54px;top:77px;width:443px;font-size:16px">The pink one everyone steals first.</p>
+        <p class="a" style="left:54px;top:152px;font-size:30px;font-weight:500">$3.99</p>
+        <a class="btn a" href="#club" style="left:328px;top:142px;width:207px;height:52px">Grab a pack</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mint -->
+  <div class="a" style="left:140.01px;top:1746.85px;width:591.986px;height:692.293px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-3deg);background:var(--mint);width:558px;height:664px;border-radius:50px"></div>
+  </div>
+  <div class="a" style="left:142.97px;top:1765.19px;width:576.069px;height:654.612px;display:flex;align-items:center;justify-content:center">
+    <div class="bd6" style="transform:rotate(-3deg);background:#e4f3f2;width:544px;height:627px;border-radius:50px;overflow:hidden;position:relative">
+      <div class="a" style="left:83.99px;top:-35.74px;width:381.89px;height:461.407px">
+        <div class="clip"><img style="height:232.2%;left:-320.55%;top:-115.19%;width:420.55%" src="img/cool.jpg" alt=""></div>
+      </div>
+      <div class="a bd3 r99" style="left:8px;top:24px;width:122px;height:43px;background:#fb8427;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:.36px">LIMITED</div>
+      <div class="a" style="left:-27px;top:397px;width:586px;height:224px;background:#fff;border-radius:40px;overflow:hidden">
+        <p class="d a" style="left:58px;top:30px;font-size:24px">Mint Rush</p>
+        <p class="a" style="left:58px;top:77px;width:441px;font-size:16px">Cool mint flavor with an icy kick that hits instantly.</p>
+        <p class="a" style="left:58px;top:138px;font-size:30px;font-weight:500">$3.60</p>
+        <a class="btn a" href="#club" style="left:323px;top:138px;width:207px;height:52px">Grab a pack</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secret -->
+  <div class="a" style="left:727.01px;top:1745.85px;width:591.986px;height:692.293px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(3deg);background:var(--mint);width:558px;height:664px;border-radius:50px"></div>
+  </div>
+  <div class="a" style="left:728.99px;top:1764.19px;width:576.017px;height:653.613px;display:flex;align-items:center;justify-content:center">
+    <div class="bd6" style="transform:rotate(3deg);background:#fff;width:544px;height:626px;border-radius:50px;overflow:hidden;position:relative">
+      <div class="a bd3 r99" style="left:17px;top:21px;width:128px;height:43px;background:#c4c4c4;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:.36px">COMING SOON</div>
+      <p class="a ctr" style="left:60px;top:148px;width:395px;font-size:41px;font-weight:700;letter-spacing:1.23px">SECRET FLAVOR</p>
+      <span class="a" style="left:351px;top:50px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:420px;top:10px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:466px;top:158px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:449px;top:240px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:325px;top:122px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:241px;top:108px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:263px;top:28px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:95px;top:104px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:17px;top:149px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:6px;top:252px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:68px;top:325px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:234px;top:261px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:121px;top:261px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:301px;top:325px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:357px;top:262px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:391px;top:330px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:455px;top:307px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:448px;top:77px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:388px;top:145px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:17px;top:77px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:153px;top:131px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:173px;top:34px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:177px;top:325px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <span class="a" style="left:6px;top:325px;font-size:26px;font-weight:700;opacity:.35">?</span>
+      <div class="a" style="left:-7px;top:394px;width:545px;border-top:4px solid #000"></div>
+      <div class="a" style="left:-27px;top:394px;width:583px;height:223px;background:#fff;border-radius:40px;overflow:hidden">
+        <p class="a" style="left:54px;top:30px;width:470px;font-size:24px;font-weight:500">Got a crazy flavor idea?</p>
+        <p class="a" style="left:54px;top:84px;width:328px;font-size:16px">Submit your dream BubbleFun drop below.</p>
+        <a class="btn a" href="#club" style="left:305px;top:134px;width:220px;height:50px">Create a flavour→</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MARQUEE 5064 ================= -->
+<div class="mq a" style="left:0;top:5064px;width:1440px;height:93px;border-top:3px solid #000;border-bottom:3px solid #000">
+  <div class="mq-t">
+    <span>STRAWBERRY BLAST • MINT RUSH • LEMON BURST • PLUM BLISS • ORANGE SPLASH • STRAWBERRY BLAST • MINT RUSH • LEMON BURST • PLUM BLISS • ORANGE SPLASH •&nbsp;</span>
+    <span>STRAWBERRY BLAST • MINT RUSH • LEMON BURST • PLUM BLISS • ORANGE SPLASH • STRAWBERRY BLAST • MINT RUSH • LEMON BURST • PLUM BLISS • ORANGE SPLASH •&nbsp;</span>
+  </div>
+</div>
+
+<!-- ================= FANS 5157–6304 ================= -->
+<div class="a" id="fans" style="left:0;top:5157px;width:1440px;height:1147px">
+  <p class="d a ctr" style="left:350px;top:82px;width:818px;font-size:64px;line-height:75px;white-space:pre">PEOPLE WHO CHEW
+LOUDLY,                 LOUDER.</p>
+  <div class="a" style="left:645px;top:146px;width:216.446px;height:98.754px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-5.82deg);background:var(--pink2);border-radius:30px;width:209.629px;height:77.906px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+      <p class="d" style="font-size:64px;line-height:1.1;letter-spacing:1.92px">LIVE</p>
+    </div>
+  </div>
+
+  <div class="a" style="left:153px;top:412px;width:397.338px;height:448.616px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(5.99deg);background:var(--mint);width:356.083px;height:413.692px;border-radius:50px"></div>
+  </div>
+  <div class="a" style="left:152.71px;top:418px;width:385.005px;height:441.708px;display:flex;align-items:center;justify-content:center">
+    <div class="bd3" style="transform:rotate(6.21deg);width:343px;height:407px;border-radius:40px;overflow:hidden;position:relative">
+      <div class="clip"><img style="height:178.56%;left:-108.88%;top:-23.17%;width:317.76%" src="img/fans.jpg" alt=""></div>
+    </div>
+  </div>
+
+  <div class="a" style="left:547.2px;top:325.21px;width:359.34px;height:390.875px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-1.64deg);background:var(--mint);width:348.563px;height:381.042px;border-radius:50px"></div>
+  </div>
+  <div class="a" style="left:544.98px;top:335.03px;width:347.977px;height:358.516px;display:flex;align-items:center;justify-content:center">
+    <div class="bd3" style="transform:rotate(-2deg);width:336.072px;height:346.999px;border-radius:40px;overflow:hidden;position:relative">
+      <div class="clip"><img style="height:209.06%;left:-218.74%;top:-29.86%;width:323.37%" src="img/fans.jpg" alt=""></div>
+    </div>
+  </div>
+
+  <div class="a" style="left:903.22px;top:392.46px;width:425.659px;height:465.136px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-8.85deg);background:var(--mint);width:366.371px;height:413.692px;border-radius:50px"></div>
+  </div>
+  <div class="a" style="left:906.71px;top:405px;width:404.606px;height:445.538px;display:flex;align-items:center;justify-content:center">
+    <div class="bd3" style="transform:rotate(-8.79deg);width:348px;height:397px;border-radius:40px;overflow:hidden;position:relative">
+      <div class="clip"><img style="height:188.11%;left:-4.61%;top:-27.92%;width:322.01%" src="img/fans.jpg" alt=""></div>
+    </div>
+  </div>
+
+  <div class="a" style="left:523px;top:662.93px;width:398.964px;height:220.148px;display:flex;align-items:center;justify-content:center">
+    <blockquote class="bd4" style="transform:rotate(3.01deg);background:#fff;border-radius:40px;height:200px;display:flex;align-items:center;justify-content:center;padding:10px;margin:0;filter:drop-shadow(0 5px 2px rgba(0,0,0,.25))">
+      <p class="ctr pre" style="width:369px;font-size:20px;line-height:1.3">“I bought one pack. Somehow I left with six.”
+
+<span style="font-size:16px">-NINA, 21
+ BubbleClub member</span></p>
+    </blockquote>
+  </div>
+  <div class="a" style="left:933.71px;top:780px;width:397.796px;height:216.414px;display:flex;align-items:center;justify-content:center">
+    <blockquote class="bd3" style="transform:rotate(2.44deg);background:#fff;border-radius:40px;height:200px;display:flex;align-items:center;justify-content:center;padding:10px;margin:0;filter:drop-shadow(0 5px 2px rgba(0,0,0,.25))">
+      <p class="ctr pre" style="width:369px;font-size:20px;line-height:1.3">“Plum Bliss is weirdly addictive. I need an emotional support pack.”
+
+<span style="font-size:16px">-MARIA, 24</span></p>
+    </blockquote>
+  </div>
+  <div class="a" style="left:132px;top:799px;width:403.088px;height:228.246px;display:flex;align-items:center;justify-content:center">
+    <blockquote class="bd3" style="transform:rotate(-4.24deg);background:#fff;border-radius:40px;height:200px;display:flex;align-items:center;justify-content:center;padding:10px;margin:0;filter:drop-shadow(0 5px 2px rgba(0,0,0,.25))">
+      <p class="ctr pre" style="width:369px;font-size:20px;line-height:1.3">“Strawberry Blast tastes like a sleepover and chaos in the best way possible.”
+
+<span style="font-size:16px">-MIA, 19</span></p>
+    </blockquote>
+  </div>
+</div>
+
+<!-- ================= CLUB 6304–7295 ================= -->
+<div class="a" id="club" style="left:-1px;top:6304px;width:1440px;height:991px">
+  <div class="a" style="left:149px;top:69px;width:257.609px;height:102.948px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-5.82deg);background:var(--pink2);border-radius:30px;width:251.005px;height:77.906px;display:flex;align-items:center;justify-content:center">
+      <p class="d" style="font-size:64px;line-height:1.1;letter-spacing:1.92px">CREATE</p>
+    </div>
+  </div>
+  <p class="d a" style="left:154px;top:85px;width:542px;font-size:64px;line-height:76px;white-space:pre">                     YOUR
+DREAM FLAVOR</p>
+
+  <div class="a" style="left:148.8px;top:288.28px;width:1142.39px;height:631.209px;display:flex;align-items:center;justify-content:center">
+    <div class="bd3" style="transform:rotate(1.15deg) skewX(0.15deg);background:var(--sun2);width:1132.031px;height:608.606px;border-radius:40px;overflow:hidden;position:relative">
+      <p class="a pre" style="left:64px;top:83px;width:400px;font-size:16px;line-height:1.5">Join the BubbleClub and get first access
+to limited flavors before they disappear.</p>
+      <p class="a pre" style="left:54px;top:170px;width:379px;font-size:20px;line-height:1.7">• Early access to limited drops
+• BubbleClub rewards &amp; discounts
+• Vote for future flavors
+• Exclusive surprise packs</p>
+      <p class="a ctr" style="left:21px;top:538px;width:407px;font-size:12px;opacity:.75">By submitting, you agree to our <u>Terms of Use</u> and <u>Privacy Policy</u>.</p>
+    </div>
+  </div>
+
+  <form id="clubform" novalidate>
+    <label class="a" for="f-name" style="left:682.41px;top:360px;font-size:18px;transform:rotate(2.2deg)">Your name</label>
+    <div class="a" style="left:680.26px;top:387.97px;width:554.318px;height:66.153px;display:flex;align-items:center;justify-content:center">
+      <div style="transform:rotate(2.2deg);width:553px;height:45px"><input id="f-name" name="name" type="text" autocomplete="name"></div>
+    </div>
+    <label class="a" for="f-mail" style="left:679px;top:457.93px;font-size:18px;transform:rotate(2.2deg)">Email</label>
+    <div class="a" style="left:677px;top:481.91px;width:554.318px;height:66.153px;display:flex;align-items:center;justify-content:center">
+      <div style="transform:rotate(2.2deg);width:553px;height:45px"><input id="f-mail" name="email" type="email" autocomplete="email"></div>
+    </div>
+    <label class="a" for="f-flav" style="left:676.01px;top:552.88px;font-size:18px;transform:rotate(2.2deg)">Pick a flavor</label>
+    <div class="a" style="left:673.94px;top:578.85px;width:554.318px;height:66.153px;display:flex;align-items:center;justify-content:center">
+      <div style="transform:rotate(2.2deg);width:553px;height:45px"><select id="f-flav" name="flavor"><option>Lemon Burst</option><option>Orange Splash</option><option>Plum Bliss</option><option>Strawberry Blast</option><option>Mint Rush</option><option>Surprise me</option></select></div>
+    </div>
+    <label class="a" for="f-note" style="left:672.6px;top:651.81px;font-size:18px;transform:rotate(2.2deg)">Note (optional)</label>
+    <div class="a" style="left:668px;top:675.79px;width:556.923px;height:134.103px;display:flex;align-items:center;justify-content:center">
+      <div style="transform:rotate(2.2deg);width:553px;height:113px"><textarea id="f-note" name="note"></textarea></div>
+    </div>
+    <div class="a" style="left:845px;top:821px;width:205.052px;height:50.214px;display:flex;align-items:center;justify-content:center">
+      <button class="btn" type="submit" style="--rot:1.1deg;width:205px;height:50px;font-size:16px">Let me in→</button>
+    </div>
+    <p class="a" id="done" hidden style="left:672px;top:880px;width:400px;font-size:16px;font-weight:500">Thanks — your spot in the club is saved.</p>
+  </form>
+</div>
+
+<div class="a" style="left:1109.68px;top:6555.29px;width:258.078px;height:144.004px;display:flex;align-items:center;justify-content:center">
+  <div class="bd3 r99" style="transform:rotate(19.98deg);background:var(--mint);width:252.239px;height:61.518px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:.36px">15% OFF YOUR FIRST DROP</div>
+</div>
+
+<!-- ================= FOOTER 7293 ================= -->
+<div class="a" style="left:4px;top:7293px;width:1439px;height:514px">
+  <p class="d a" style="left:157px;top:84px;width:467px;font-size:96px;line-height:1.1">BUBBLE</p>
+  <div class="a" style="left:152px;top:185px;width:261.124px;height:137.45px;display:flex;align-items:center;justify-content:center">
+    <div style="transform:rotate(-5.82deg);background:var(--pink2);border-radius:30px;width:251.005px;height:112.587px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+      <p class="d" style="font-size:96px;line-height:1.04;letter-spacing:2.88px">FUN!</p>
+    </div>
+  </div>
+  <p class="a pre" style="left:157px;top:341px;width:355px;font-size:16px;line-height:1.5">Sugar free bubble gum made
+for loud flavors and bigger bubbles.</p>
+
+  <p class="a" style="left:720px;top:189px;font-size:16px;font-weight:500">LEGAL</p>
+  <a class="a" href="#club" style="left:720px;top:255px;font-size:16px;opacity:.68;text-decoration:none">Privacy</a>
+  <a class="a" href="#club" style="left:720px;top:315px;font-size:16px;opacity:.68;text-decoration:none">Terms</a>
+  <a class="a" href="#club" style="left:720px;top:372px;font-size:16px;opacity:.68;text-decoration:none">Shipping</a>
+
+  <p class="a" style="left:907px;top:189px;font-size:16px;font-weight:500">SHOP</p>
+  <a class="a" href="#flavours" style="left:907px;top:255px;font-size:16px;opacity:.68;text-decoration:none">All Flavors</a>
+  <a class="a" href="#club" style="left:907px;top:315px;font-size:16px;opacity:.68;text-decoration:none">BubbleClub</a>
+  <a class="a" href="#flavours" style="left:907px;top:372px;font-size:16px;opacity:.68;text-decoration:none">Secret Flavor</a>
+
+  <p class="a" style="left:1101px;top:188px;font-size:16px;font-weight:500">BRAND</p>
+  <a class="a" href="#health" style="left:1093px;top:255px;font-size:16px;opacity:.68;text-decoration:none">About</a>
+  <a class="a" href="#fans" style="left:1093px;top:315px;font-size:16px;opacity:.68;text-decoration:none">Fans</a>
+  <a class="a" href="#club" style="left:1093px;top:372px;font-size:16px;opacity:.68;text-decoration:none">Contact</a>
+
+  <a class="a" href="#fans" aria-label="Instagram" style="left:156px;top:412px;width:65px;height:65px;border:3px solid #000;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="#000" stroke="none"/></svg>
+  </a>
+  <a class="a" href="#fans" aria-label="Facebook" style="left:245px;top:412px;width:65px;height:65px;border:3px solid #000;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="#000"><path d="M13.5 21v-8h2.7l.4-3h-3.1V8.2c0-.9.3-1.5 1.5-1.5h1.7V4.1c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3V10H7v3h3v8h3.5z"/></svg>
+  </a>
+  <p class="a" style="left:720px;top:450px;width:700px;font-size:12px;opacity:.5">BubbleFun is a fictional brand. Concept and design: Milica Cucić.</p>
+</div>
+
+</div>
+
+<!-- ======================= PHONE 375 × 7988 ======================= -->
+<div id="stage-m" class="st">
+<div class="clip" style="z-index:0"><img class="cover" style="position:absolute;inset:0;opacity:.85" src="img/bg.jpg" alt=""></div>
+
+<!-- hero -->
+<div class="a" style="left:115px;top:19px;width:146px;height:42px">
+  <span class="d a" style="left:0;top:22.01px;font-size:20px;transform:rotate(-39.48deg) skewX(2.53deg)">B</span>
+  <span class="d a" style="left:15.11px;top:11.83px;font-size:20px;transform:rotate(-29.08deg) skewX(2.23deg)">U</span>
+  <span class="d a" style="left:32.19px;top:4.66px;font-size:20px;transform:rotate(-18.82deg) skewX(1.62deg)">B</span>
+  <span class="d a" style="left:50.66px;top:0.74px;font-size:20px;transform:rotate(-8.66deg) skewX(0.8deg)">B</span>
+  <span class="d a" style="left:69.44px;top:0;font-size:20px;transform:rotate(0.96deg)">L</span>
+  <span class="d a" style="left:83.85px;top:0.82px;font-size:20px;transform:rotate(10.11deg) skewX(-0.92deg)">E</span>
+  <span class="d a" style="left:97.98px;top:4.41px;font-size:20px;transform:rotate(19.06deg) skewX(-1.64deg)">F</span>
+  <span class="d a" style="left:110.73px;top:10.3px;font-size:20px;transform:rotate(28.59deg) skewX(-2.2deg)">U</span>
+  <span class="d a" style="left:124.44px;top:20.03px;font-size:20px;transform:rotate(39.23deg) skewX(-2.53deg)">N</span>
+</div>
+<p class="a ctr" style="left:20px;top:152px;width:336px;font-size:10px;white-space:nowrap">NEW DROP • SUGAR FREE • BIG FLAVOR</p>
+<p class="d a ctr" style="left:20px;top:171px;width:336px;font-size:50px;line-height:1.1">CHEW BIG.</p>
+<div class="a" style="left:31px;top:219px;width:126.578px;height:78.039px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-10.39deg) skewX(-7.15deg);background:var(--pink);border-radius:30px;width:125.496px;height:55.501px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <p class="d" style="font-size:50px;line-height:1.05">POP</p>
+  </div>
+</div>
+<p class="d a ctr" style="left:147px;top:221px;width:211px;font-size:50px;line-height:40px">BIGGER.</p>
+<p class="a ctr pre" style="left:20px;top:308px;width:336px;font-size:14px;line-height:22px">Sugar free gum made to stand out.
+Bold flavors, wild shapes, and bubbles worth showing off.</p>
+
+<div class="a" style="left:98.64px;top:400px;width:127.233px;height:104.605px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-7.02deg);filter:blur(2.5px);width:116.993px;height:90.995px;position:relative">
+    <div class="clip"><img style="height:270.9%;left:-210.49%;top:-142.33%;width:316.05%" src="img/tins.png" alt=""></div>
+  </div>
+</div>
+<div class="a" style="left:177.87px;top:411.23px;width:149.373px;height:125.157px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(5.91deg);filter:blur(2px);width:138.635px;height:111.48px;position:relative">
+    <div class="clip"><img style="height:261.23%;left:-108.76%;top:-136.04%;width:314.77%" src="img/tins.png" alt=""></div>
+  </div>
+</div>
+<div class="a" style="left:16px;top:450.11px;width:171.138px;height:140.851px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-3.68deg);filter:blur(1.5px);width:163.096px;height:130.662px;position:relative">
+    <div class="clip"><img style="height:242.08%;left:0.04%;top:-123.73%;width:290.91%" src="img/tins.png" alt=""></div>
+  </div>
+</div>
+<img class="a" style="left:213.18px;top:458.91px;width:142.818px;height:144.408px" src="img/tin-mint.png" alt="">
+<img class="a" style="left:63.22px;top:479.91px;width:231.343px;height:208.587px" src="img/tin-straw.png" alt="BubbleFun strawberry tin">
+<div class="a" style="left:43px;top:681px;width:295px;height:25px;background:radial-gradient(50% 50% at 50% 50%, rgba(0,0,0,.17) 0%, rgba(0,0,0,0) 70%)"></div>
+
+<a class="btn btn--o a" href="#m-flavours" style="left:22px;top:737px;width:335px;height:52px;font-size:16px">Explore flavours</a>
+<a class="btn a" href="#m-club" style="left:19px;top:809px;width:338px;height:52px;font-size:16px">Shop the pop</a>
+
+<!-- marquee 1 -->
+<div class="mq a" style="left:0;top:921px;width:375px;height:53px;border-top:3px solid #000;border-bottom:3px solid #000">
+  <div class="mq-t">
+    <span style="font-size:14px;letter-spacing:.42px">SUGAR FREE • BIG FLAVOR • ZERO GUILT • FRESH BREATH • WILD SHAPES • DENTIST APPROVED •&nbsp;</span>
+    <span style="font-size:14px;letter-spacing:.42px">SUGAR FREE • BIG FLAVOR • ZERO GUILT • FRESH BREATH • WILD SHAPES • DENTIST APPROVED •&nbsp;</span>
+  </div>
+</div>
+
+<!-- claim -->
+<p class="d a ctr" style="left:38px;top:1024px;width:298px;font-size:40px;line-height:46px;white-space:pre">BIG CHEW.
+             REGRET.</p>
+<div class="a" style="left:44px;top:1071.48px;width:136.434px;height:60.518px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-5.82deg);background:var(--pink2);border-radius:30px;width:132.316px;height:47.35px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <p class="d" style="font-size:40px;line-height:1.1">ZERO</p>
+  </div>
+</div>
+<div class="a" style="left:11.1px;top:1206px;width:360.589px;height:252.304px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(3deg);background:var(--mint);width:348.801px;height:234.371px;border-radius:69px"></div>
+</div>
+<div class="a" style="left:9px;top:1209px;width:355px;height:247.649px;display:flex;align-items:center;justify-content:center">
+  <div class="bd4" style="transform:rotate(3.31deg);width:342.392px;height:228.261px;border-radius:69px;overflow:hidden">
+    <img class="cover" src="img/doctor.jpg" alt="Dentist in a white coat">
+  </div>
+</div>
+<div class="a" style="left:18.01px;top:1404.77px;width:338.909px;height:179.894px;display:flex;align-items:center;justify-content:center">
+  <blockquote class="bd3" style="transform:rotate(-7deg) skewX(-6.31deg);background:#fff;border-radius:40px;width:339.77px;height:138.496px;display:flex;align-items:center;justify-content:center;padding:10px;margin:0;filter:drop-shadow(0 4px 2px rgba(0,0,0,.25))">
+    <p class="ctr pre" style="width:312.388px;font-size:14px;line-height:1.3">“It’s the only gum I recommend to my younger patients. Sugar free, xylitol powered, and somehow still fun.”
+— Dr. Eddy Patel, DDS</p>
+  </blockquote>
+</div>
+
+<div class="a" style="left:17.48px;top:1639.82px;width:352.799px;height:189.785px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-3deg);background:var(--mint);width:344.269px;height:172.003px;border-radius:40px"></div>
+</div>
+<div class="a" style="left:14.59px;top:1642.88px;width:349.671px;height:185.098px;display:flex;align-items:center;justify-content:center">
+  <div class="bd3" style="transform:rotate(-3deg) skewX(0.82deg);background:#fff;width:338.959px;height:167.731px;border-radius:40px;position:relative">
+    <div class="a" style="left:146.27px;top:15.5px;width:46.815px;height:45.905px;display:flex;align-items:center;justify-content:center">
+      <img style="transform:rotate(1.24deg) skewX(3.67deg);width:44.855px;height:44.85px;object-fit:contain" src="img/ic-tooth.png" alt="">
+    </div>
+    <p class="a ctr" style="left:23.1px;top:78px;width:302.175px;font-size:14px;line-height:1.3">Made with xylitol to help reduce cavity causing bacteria while keeping every chew flavorful.</p>
+  </div>
+</div>
+<div class="a" style="left:9.95px;top:1858.86px;width:359.554px;height:189.208px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(3deg);background:var(--mint);width:351.082px;height:171.069px;border-radius:40px"></div>
+</div>
+<div class="a" style="left:8px;top:1859.78px;width:357.413px;height:186.467px;display:flex;align-items:center;justify-content:center">
+  <div class="bd3" style="transform:rotate(3.3deg) skewX(-0.87deg);background:#fff;width:345.831px;height:167px;border-radius:40px;position:relative">
+    <div class="a" style="left:143.69px;top:20.6px;width:46.424px;height:45.89px;display:flex;align-items:center;justify-content:center">
+      <img style="transform:rotate(-1.19deg) skewX(-3.04deg);width:44.936px;height:44.901px;object-fit:contain" src="img/ic-breath.png" alt="">
+    </div>
+    <p class="a ctr" style="left:19px;top:82px;width:305.013px;font-size:14px;line-height:1.3">Long lasting flavor that stays bold long after the bubble pops.</p>
+  </div>
+</div>
+<div class="a" style="left:18.88px;top:2074.44px;width:347.112px;height:185.956px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-3deg);background:var(--mint);width:338.76px;height:168.458px;border-radius:41px"></div>
+</div>
+<div class="a" style="left:11.93px;top:2077.1px;width:351.963px;height:181.753px;display:flex;align-items:center;justify-content:center">
+  <div class="bd3" style="transform:rotate(-3deg) skewX(2.74deg);background:#fff;width:335.921px;height:165px;border-radius:40px;position:relative">
+    <div class="a" style="left:140.54px;top:14.27px;width:56.859px;height:53.641px;display:flex;align-items:center;justify-content:center">
+      <img style="transform:rotate(0.47deg) skewX(4.55deg);width:53.028px;height:53.025px;object-fit:contain" src="img/ic-sugarfree.png" alt="">
+    </div>
+    <p class="a ctr" style="left:19.9px;top:75px;width:302.686px;font-size:14px;line-height:1.3">Designed for fun without the sugar crash. Big flavor, cleaner ingredients, fresher breath.</p>
+  </div>
+</div>
+
+<!-- products -->
+<div class="a" id="m-flavours" style="left:22px;top:2403.2px;width:126.589px;height:64.126px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-5.82deg);background:var(--pink2);border-radius:30px;width:121.943px;height:52.034px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <p class="d" style="font-size:40px;line-height:1.1;letter-spacing:1.5px">PICK</p>
+  </div>
+</div>
+<p class="d a" style="left:28px;top:2412px;width:333px;font-size:40px;line-height:57px;letter-spacing:1.2px;white-space:pre">             YOUR
+BUBBLE MOOD.</p>
+<p class="a" style="left:22px;top:2529px;width:334px;font-size:14px;line-height:22px">Every BubbleFun shape brings a different flavor hit from juicy fruit blasts to cool mint chaos.</p>
+
+<div class="a" style="left:6.74px;top:2637.39px;width:359.227px;height:553.263px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(1.17deg) skewX(0.32deg);background:var(--mint);width:351.155px;height:546.153px;border-radius:50px"></div>
+</div>
+<div class="a" style="left:7.16px;top:2640.81px;width:351.242px;height:546.941px;display:flex;align-items:center;justify-content:center">
+  <div class="bd6" style="transform:rotate(1.17deg) skewX(0.31deg);background:#e9d9f7;width:343.249px;height:540px;border-radius:50px;overflow:hidden;position:relative">
+    <div class="a" style="left:51.8px;top:-12.61px;width:257.63px;height:311.006px">
+      <div class="clip"><img style="height:234.32%;left:-324.03%;top:-3.89%;width:424.03%" src="img/cool.jpg" alt=""></div>
+    </div>
+    <div class="a bd3 r99" style="left:8px;top:24px;width:122px;height:38px;background:#fb8427;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;letter-spacing:.3px">LIMITED</div>
+    <div class="a" style="left:-26.26px;top:283.64px;width:386.148px;height:244px;background:#fff;border-radius:40px;overflow:hidden;border-top:4px solid #000">
+      <p class="d a" style="left:45.25px;top:22px;font-size:18px">Plum Bliss</p>
+      <p class="a" style="left:45.92px;top:64px;width:295px;font-size:14px">Smooth fruity chew with juicy plum notes.</p>
+      <p class="a" style="left:46.53px;top:105px;font-size:20px;font-weight:500">$4.49</p>
+      <a class="btn a" href="#m-club" style="left:37.71px;top:164.26px;width:304.4px;height:52px;font-size:14px">Grab a pack</a>
+    </div>
+  </div>
+</div>
+
+<div class="a" style="left:12.1px;top:3235.53px;width:360.201px;height:558.623px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-2.37deg) skewX(-0.68deg);background:var(--mint);width:344.438px;height:544.631px;border-radius:50px"></div>
+</div>
+<div class="a" style="left:12.83px;top:3238.06px;width:352.316px;height:553.673px;display:flex;align-items:center;justify-content:center">
+  <div class="bd6" style="transform:rotate(-2.37deg) skewX(-0.68deg);background:#fce7ec;width:336.683px;height:540px;border-radius:50px;overflow:hidden;position:relative">
+    <div class="a" style="left:7.5px;top:8.15px;width:330.867px;height:273.396px">
+      <div class="clip"><img style="height:307.51%;left:-281.14%;top:0;width:381.14%" src="img/warm.jpg" alt=""></div>
+    </div>
+    <div class="a bd3 r99" style="left:8px;top:21px;width:122px;height:38px;background:var(--mint);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;letter-spacing:.3px">BESTSELLER</div>
+    <div class="a" style="left:-30.54px;top:288.88px;width:381.842px;height:244px;background:#fff;border-radius:40px;overflow:hidden;border-top:4px solid #000">
+      <p class="d a" style="left:45.29px;top:28px;font-size:18px">Strawberry Blast</p>
+      <p class="a" style="left:42.96px;top:70px;width:300px;font-size:14px">The pink one everyone steals first.</p>
+      <p class="a" style="left:49.44px;top:113px;font-size:20px;font-weight:500">$3.99</p>
+      <a class="btn a" href="#m-club" style="left:40.3px;top:160.7px;width:303.355px;height:52px;font-size:14px">Grab a pack</a>
+    </div>
+  </div>
+</div>
+
+<div class="a" style="left:12.14px;top:3838.85px;width:357.449px;height:566.88px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(3.41deg) skewX(0.76deg);background:var(--mint);width:332.791px;height:547.689px;border-radius:50px"></div>
+</div>
+<div class="a" style="left:13.55px;top:3842.91px;width:349.979px;height:559.162px;display:flex;align-items:center;justify-content:center">
+  <div class="bd6" style="transform:rotate(3.41deg) skewX(0.78deg);background:#e4f3f2;width:325.704px;height:540.339px;border-radius:50px;overflow:hidden;position:relative">
+    <div class="a" style="left:45.3px;top:-5.77px;width:252.436px;height:304.998px">
+      <div class="clip"><img style="height:232.2%;left:-320.55%;top:-115.19%;width:420.55%" src="img/cool.jpg" alt=""></div>
+    </div>
+    <div class="a bd3 r99" style="left:8px;top:24px;width:122px;height:40px;background:#fb8427;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;letter-spacing:.36px">LIMITED</div>
+    <div class="a" style="left:-26.11px;top:288.6px;width:385.523px;height:244.944px;background:#fff;border-radius:40px;overflow:hidden;border-top:4px solid #000">
+      <p class="d a" style="left:45.69px;top:25px;font-size:18px">Mint Rush</p>
+      <p class="a" style="left:45.76px;top:67px;width:270px;font-size:14px">Cool mint flavor with an icy kick that hits instantly.</p>
+      <p class="a" style="left:46.12px;top:113px;font-size:20px;font-weight:500">$3.60</p>
+      <a class="btn a" href="#m-club" style="left:38.38px;top:156.85px;width:290.507px;height:52px;font-size:14px">Grab a pack</a>
+    </div>
+  </div>
+</div>
+
+<div class="a" style="left:22.26px;top:4487px;width:329.094px;height:59.977px;display:flex;align-items:center;justify-content:center">
+  <a class="btn" href="#m-club" style="--rot:-1.4deg;width:327.005px;height:52.021px;font-size:14px">See all→</a>
+</div>
+
+<!-- marquee 2 -->
+<div class="mq a" style="left:-3px;top:4631px;width:381px;height:53px;border-top:3px solid #000;border-bottom:3px solid #000">
+  <div class="mq-t">
+    <span style="font-size:14px;letter-spacing:.42px">STRAWBERRY BLAST • MINT RUSH • LEMON BURST • PLUM BLISS •&nbsp;</span>
+    <span style="font-size:14px;letter-spacing:.42px">STRAWBERRY BLAST • MINT RUSH • LEMON BURST • PLUM BLISS •&nbsp;</span>
+  </div>
+</div>
+
+<!-- fans -->
+<p class="d a ctr" style="left:17px;top:4740px;width:341px;font-size:40px;line-height:44px;white-space:pre">PEOPLE WHO
+CHEW LOUDLY,</p>
+<p class="d a" style="left:186px;top:4828px;font-size:40px;line-height:44px;white-space:nowrap">LOUDER.</p>
+<div class="a" style="left:24.72px;top:4822.54px;width:149.966px;height:65.504px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-5.82deg);background:var(--pink2);border-radius:30px;width:145.545px;height:51.014px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <p class="d" style="font-size:40px;line-height:1.1;letter-spacing:1.2px">LIVE</p>
+  </div>
+</div>
+<div class="a" style="left:9.59px;top:4912.39px;width:349.774px;height:377.842px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-8.57deg) skewX(0.57deg);background:var(--mint);width:299.508px;height:337.493px;border-radius:50px"></div>
+</div>
+<div class="a" style="left:13.7px;top:4915.35px;width:336.502px;height:370.545px;display:flex;align-items:center;justify-content:center">
+  <div class="bd3" style="transform:rotate(-8.79deg);width:289.424px;height:330.177px;border-radius:40px;overflow:hidden;position:relative">
+    <div class="clip"><img style="height:188.11%;left:-4.61%;top:-27.92%;width:322.01%" src="img/fans.jpg" alt=""></div>
+  </div>
+</div>
+<div class="a" style="left:22.95px;top:5225.17px;width:335.047px;height:149.825px;display:flex;align-items:center;justify-content:center">
+  <blockquote class="bd3" style="transform:rotate(2.36deg) skewX(-0.16deg);background:#fff;border-radius:40px;width:329.325px;height:136.381px;display:flex;align-items:center;justify-content:center;padding:10px;margin:0;filter:drop-shadow(0 5px 2px rgba(0,0,0,.25))">
+    <p class="ctr pre" style="width:282.861px;font-size:14px;line-height:1.35">“Plum Bliss is weirdly addictive. I need an emotional support pack.”
+
+-MARIA, 24</p>
+  </blockquote>
+</div>
+<button class="a" type="button" aria-label="Previous" style="left:113px;top:5432px;width:65px;height:65px;border:3px solid #000;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 L8 12 L15 19"/></svg>
+</button>
+<button class="a" type="button" aria-label="Next" style="left:198px;top:5432px;width:65px;height:65px;border:3px solid #000;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5 L16 12 L9 19"/></svg>
+</button>
+
+<!-- club -->
+<div class="a" id="m-club" style="left:17.46px;top:5631px;width:178.229px;height:72.847px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-5.82deg);background:var(--pink2);border-radius:30px;width:173.493px;height:55.548px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <p class="d" style="font-size:40px;line-height:1.1;letter-spacing:1.2px">CREATE</p>
+  </div>
+</div>
+<p class="d a" style="left:23px;top:5647px;width:350px;font-size:40px;line-height:50px;white-space:pre">                      YOUR
+DREAM FLAVOR</p>
+
+<div class="a" style="left:10.29px;top:5798.15px;width:342.726px;height:893.788px;display:flex;align-items:center;justify-content:center">
+  <div class="bd3" style="transform:rotate(5deg) skewX(5.53deg);background:var(--sun2);width:335.984px;height:864.542px;border-radius:40px;overflow:hidden;position:relative">
+    <p class="a pre" style="left:28.34px;top:64.56px;width:286.317px;font-size:14px;line-height:1.5;transform:rotate(-0.47deg)">Join the BubbleClub and get first access
+to limited flavors before they disappear.</p>
+    <p class="a pre" style="left:20.97px;top:132.3px;width:278.621px;font-size:16px;line-height:1.7;transform:rotate(-0.87deg)">• Early access to limited drops
+• BubbleClub rewards &amp; discounts
+• Vote for future flavors
+• Exclusive surprise packs</p>
+    <form id="clubform-m" novalidate>
+      <label class="a" for="fm-name" style="left:42.23px;top:288.49px;font-size:14px">Your name</label>
+      <div class="a" style="left:34.36px;top:320.95px;width:263.825px;height:40.64px;display:flex;align-items:center;justify-content:center">
+        <div style="width:260.881px;height:39.989px"><input id="fm-name" name="name" type="text" autocomplete="name" style="font-size:14px;padding:0 16px"></div>
+      </div>
+      <label class="a" for="fm-mail" style="left:42.4px;top:385.4px;font-size:14px">Email</label>
+      <div class="a" style="left:33.21px;top:414.92px;width:263.711px;height:40.639px;display:flex;align-items:center;justify-content:center">
+        <div style="width:260.767px;height:39.989px"><input id="fm-mail" name="email" type="email" autocomplete="email" style="font-size:14px;padding:0 16px"></div>
+      </div>
+      <label class="a" for="fm-flav" style="left:41.4px;top:483.37px;font-size:14px">Pick a flavor</label>
+      <div class="a" style="left:32.18px;top:511.89px;width:263.658px;height:40.639px;display:flex;align-items:center;justify-content:center">
+        <div style="width:260.714px;height:39.989px"><select id="fm-flav" name="flavor" style="font-size:14px;padding:0 16px"><option>Lemon Burst</option><option>Orange Splash</option><option>Plum Bliss</option><option>Strawberry Blast</option><option>Mint Rush</option><option>Surprise me</option></select></div>
+      </div>
+      <label class="a" for="fm-note" style="left:40.19px;top:579.34px;font-size:14px">Note (optional)</label>
+      <div class="a" style="left:30.26px;top:608.94px;width:263.361px;height:65.353px;display:flex;align-items:center;justify-content:center">
+        <div style="width:259.666px;height:64.785px"><textarea id="fm-note" name="note" style="font-size:14px;padding:10px 16px;border-radius:40px"></textarea></div>
+      </div>
+      <p class="a ctr" style="left:22.8px;top:690px;width:278.317px;font-size:10px;opacity:.75">By submitting, you agree to our <u>Terms of Use</u> and <u>Privacy Policy</u>.</p>
+      <div class="a" style="left:25.01px;top:772.5px;width:296.363px;height:53.49px;display:flex;align-items:center;justify-content:center">
+        <button class="btn" type="submit" style="--rot:-0.63deg;width:290.564px;height:50.133px;font-size:16px">Let me in→</button>
+      </div>
+      <p class="a ctr" id="done-m" hidden style="left:25px;top:828px;width:290px;font-size:13px;font-weight:500">Thanks — your spot in the club is saved.</p>
+    </form>
+  </div>
+</div>
+
+<div class="a" style="left:199.21px;top:5788.6px;width:180.262px;height:96.83px;display:flex;align-items:center;justify-content:center">
+  <div class="bd3 r99" style="transform:rotate(19.98deg);background:var(--mint);width:177.857px;height:38.367px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;letter-spacing:.3px">15% OFF YOUR FIRST DROP</div>
+</div>
+
+<!-- footer -->
+<p class="d a" style="left:30px;top:6822px;width:330px;font-size:50px;line-height:1.1">BUBBLE</p>
+<div class="a" style="left:19px;top:6906px;width:158.642px;height:90.86px;display:flex;align-items:center;justify-content:center">
+  <div style="transform:rotate(-5.82deg);background:var(--pink2);border-radius:30px;width:151.733px;height:75.871px;display:flex;align-items:center;justify-content:center;overflow:hidden">
+    <p class="d" style="font-size:50px;line-height:1.05;letter-spacing:1.5px">FUN!</p>
+  </div>
+</div>
+<p class="a pre" style="left:20px;top:7006px;width:336px;font-size:14px;line-height:22px">Sugar free bubble gum made
+for loud flavors and bigger bubbles.</p>
+<a class="a" href="#fans" aria-label="Instagram" style="left:110px;top:7076px;width:65px;height:65px;border:3px solid #000;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff">
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="#000" stroke="none"/></svg>
+</a>
+<a class="a" href="#fans" aria-label="Facebook" style="left:203px;top:7076px;width:65px;height:65px;border:3px solid #000;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff">
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="#000"><path d="M13.5 21v-8h2.7l.4-3h-3.1V8.2c0-.9.3-1.5 1.5-1.5h1.7V4.1c-.3 0-1.3-.1-2.5-.1-2.5 0-4.2 1.5-4.2 4.3V10H7v3h3v8h3.5z"/></svg>
+</a>
+
+<p class="a" style="left:173px;top:7188px;font-size:14px;font-weight:500">LEGAL</p>
+<a class="a" href="#m-club" style="left:173px;top:7254px;font-size:14px;opacity:.68;text-decoration:none">Privacy</a>
+<a class="a" href="#m-club" style="left:173px;top:7314px;font-size:14px;opacity:.68;text-decoration:none">Terms</a>
+<a class="a" href="#m-club" style="left:173px;top:7371px;font-size:14px;opacity:.68;text-decoration:none">Shipping</a>
+<p class="a" style="left:171px;top:7459px;font-size:14px;font-weight:500">SHOP</p>
+<a class="a" href="#m-flavours" style="left:171px;top:7525px;font-size:14px;opacity:.68;text-decoration:none">All Flavors</a>
+<a class="a" href="#m-club" style="left:171px;top:7585px;font-size:14px;opacity:.68;text-decoration:none">BubbleClub</a>
+<a class="a" href="#m-flavours" style="left:171px;top:7642px;font-size:14px;opacity:.68;text-decoration:none">Secret Flavor</a>
+<p class="a" style="left:175px;top:7730px;font-size:14px;font-weight:500">BRAND</p>
+<a class="a" href="#m-club" style="left:166px;top:7796px;font-size:14px;opacity:.68;text-decoration:none">About</a>
+<a class="a" href="#m-club" style="left:166px;top:7856px;font-size:14px;opacity:.68;text-decoration:none">Fans</a>
+<a class="a" href="#m-club" style="left:166px;top:7913px;font-size:14px;opacity:.68;text-decoration:none">Contact</a>
+<p class="a" style="left:20px;top:7930px;width:140px;font-size:10px;opacity:.5;line-height:1.4">BubbleFun is a fictional brand. Design: Milica Cucić.</p>
+
+</div></div>
+
+<script>
+(function () {
+  var vp = document.getElementById('viewport');
+  var deskStage = document.getElementById('stage');
+  var mobStage = document.getElementById('stage-m');
+  var BP = 760;
+
+  function fit() {
+    var w = vp.clientWidth;
+    var mobile = w < BP;
+    deskStage.style.display = mobile ? 'none' : 'block';
+    mobStage.style.display = mobile ? 'block' : 'none';
+    var st = mobile ? mobStage : deskStage;
+    var W = mobile ? 375 : 1440;
+    var H = mobile ? 7988 : 7807;
+    var s = w / W;
+    st.style.transform = 'scale(' + s + ')';
+    vp.style.height = (H * s) + 'px';
+  }
+  fit();
+  window.addEventListener('resize', fit);
+  if (window.ResizeObserver) new ResizeObserver(fit).observe(document.body);
+
+  function wire(formId, nameId, mailId, doneId) {
+    var f = document.getElementById(formId);
+    if (!f) return;
+    f.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var n = document.getElementById(nameId), m = document.getElementById(mailId);
+      if (!n.value.trim()) { n.focus(); return; }
+      if (!m.value.trim() || m.value.indexOf('@') < 1) { m.focus(); return; }
+      document.getElementById(doneId).hidden = false;
+      e.target.reset();
+    });
+  }
+  wire('clubform', 'f-name', 'f-mail', 'done');
+  wire('clubform-m', 'fm-name', 'fm-mail', 'done-m');
+})();
+</script>
